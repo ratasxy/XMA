@@ -1,0 +1,13 @@
+services:
+  openresty:
+    build: openresty
+    volumes:
+      - "./openresty/lua-resty-transparent-proxy:/opt/resty-proxy"
+      - "./cert:/var/cert"
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - memcached
+  memcached:
+    image: memcached
