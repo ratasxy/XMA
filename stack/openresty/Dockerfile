@@ -5,7 +5,8 @@ RUN apt update && \
     opm get openresty/lua-resty-redis && \
     opm get openresty/lua-resty-memcached && \
     opm get openresty/lua-resty-lrucache && \
-    opm get fffonion/lua-resty-openssl
+    opm get fffonion/lua-resty-openssl && \
+    opm get knyar/nginx-lua-prometheus
 
 RUN wget http://luarocks.org/releases/luarocks-2.0.13.tar.gz && \
     tar -xzvf luarocks-2.0.13.tar.gz && \
@@ -15,9 +16,8 @@ RUN wget http://luarocks.org/releases/luarocks-2.0.13.tar.gz && \
         --lua-suffix=jit \
         --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1 && \
     make && \
-    make install
-
-RUN luarocks install rxi-json-lua
+    make install && \
+    luarocks install rxi-json-lua
 
 COPY ./lua-resty-transparent-proxy /opt/openresty
 WORKDIR /opt/openresty

@@ -6,6 +6,7 @@ bn = require("resty.openssl.bn")
 x509_name = require("resty.openssl.x509.name")
 rand = require "resty.openssl.rand"
 x509_extension = require "resty.openssl.x509.extension"
+alt = require("resty.openssl.x509.altname").new()
 
 --  TODO
 function _M.readCA()
@@ -82,9 +83,11 @@ function _M.generate_ssl(domain)
     if not cacert then
         ngx.log(ngx.ERR, "failed to parse ca cert ", " on ", err)
     end
-
+    local wildcard = "*." .. domain
     local pubkey = pkey.new { bits = 2048 }
-
+    alternative = alt.new()
+    alternative:add("DNS", domain)
+    alternative:add("DNS", domain)
     local crt = x509.new()
     assert(crt:set_pubkey(pubkey))
     assert(crt:set_version(3))
@@ -102,9 +105,10 @@ function _M.generate_ssl(domain)
     :add("L", "Lima")
     :add("O", "La Republica")
     :add("OU", "IT Department")
-    :add("CN", domain))
+    :add("CN", wildcard))
 
     assert(crt:set_subject_name(name))
+    assert(crt:set_subject_alt_name(alternative))
     assert(crt:set_issuer_name(cacert:get_subject_name()))
 
     -- Not a CA
